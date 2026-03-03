@@ -5,10 +5,16 @@ import folium
 import webbrowser
 from shapely.geometry import Point
 import asyncio
+from get_location import get_coordinates
 
 
 
-async def render_map():
+async def render_map(destination):
+
+    destination_coords = await get_coordinates(destination)
+
+    destination_latitude = destination_coords["latitude"]
+    destination_longitude = destination_coords["longitude"]
 
     user_hazards = []
 
@@ -20,12 +26,12 @@ async def render_map():
 
     # bit of set up
     center_point = (51.4820, -3.1750) 
-    G = ox.graph_from_point(center_point, dist=1000, network_type='walk')
+    G = ox.graph_from_point(center_point, dist=3000, network_type='walk')
 
     map_hazards = [
-        ('highways', 'noise',  'primary', 6),
-        ('railways', 'noise',  '*',       8),
-        ('shop',     'vision', '*',       4)
+        ('highways', 'noise',  'primary', 3),
+        ('railways', 'noise',  '*',       2),
+        ('shop',     'vision', '*',       1)
     ]
 
     # hazards array - could be from user input or IoT sensor
@@ -37,6 +43,7 @@ async def render_map():
     ]
     danger_radius = 0.0015
 
+    
     for u, v, k, data in G.edges(data=True, keys=True):
         node_coords = G.nodes[u]
         edge_point = Point(node_coords['x'], node_coords['y'])
@@ -56,6 +63,7 @@ async def render_map():
                 if current_penalty > max_penalty:
                     max_penalty = current_penalty
 
+        map_hazard_penalty = 0
         for hazard, cat, query, score in map_hazards:
             if data.get(hazard, query):
                 map_hazard_penalty += score
@@ -63,12 +71,12 @@ async def render_map():
         map_hazard_penalty = math.pow(2, map_hazard_penalty)/len(map_hazards)
         if max_penalty < map_hazard_penalty:
             max_penalty = map_hazard_penalty
-            
+
         data['accessible_weight'] = data['length'] * max_penalty
 
     # start end coords
     start_coords = (51.4820, -3.1750) 
-    end_coords = (51.4855, -3.1775)
+    end_coords = (destination_latitude, destination_longitude)
     origin_node = ox.distance.nearest_nodes(G, X=start_coords[1], Y=start_coords[0])
     target_node = ox.distance.nearest_nodes(G, X=end_coords[1], Y=end_coords[0])
 
@@ -163,4 +171,4 @@ async def render_map():
     webbrowser.open(output_file)
 
 
-asyncio.run(render_map())
+asyncio.run(render_map('150 Woodville Road'))

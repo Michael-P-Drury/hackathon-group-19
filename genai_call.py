@@ -44,6 +44,15 @@ async def noise_scoring(user_input):
     1 - minimal problem
     10 - Very loud big problem
 
+    Use this for reference:
+
+    Noise level rating scale: item descriptions
+    1-2 Someone could comfortably hear you use a whisper / very quiet voice from 1 metre away (e.g. library)
+    3-4 You could easily hold a conversation with someone 1 metre away from you without raising your voice
+    5-6 Conversation is possible with someone 1 metre away, but requires you to raise your voice (e.g., noisy cafe)
+    7-8 You need to shout to be heard by someone 1 metre away. Difficult to hold a conversation
+    9-10 Cannot be heard by someone 1 metre away, even when shouting. Volume level may be uncomfortable after a short time
+
     return with a number from 1-10 and on a new line a 5 word description of the problem.
     """
 
@@ -125,9 +134,9 @@ async def run_input_complaint(user_input):
 
 async def create_report(report_text, location):
 
-    response = asyncio.run(run_input_complaint(report_text))
+    response = await run_input_complaint(report_text)
 
-    location = asyncio.run(get_coordinates(location))
+    location = await get_coordinates(location)
 
     append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
 
@@ -136,3 +145,4 @@ async def create_report(report_text, location):
 
     file.close()
     
+asyncio.run(create_report('a pidgeon chirping', '26 flora street'))
