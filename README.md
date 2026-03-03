@@ -20,5 +20,7 @@ osmnx
 
 folium
 
+geopy
+
 
 call genai using call_genai.invoke_cerebras('prompt', temperature)
