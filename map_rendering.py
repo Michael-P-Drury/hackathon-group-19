@@ -22,6 +22,12 @@ async def render_map():
     center_point = (51.4820, -3.1750) 
     G = ox.graph_from_point(center_point, dist=1000, network_type='walk')
 
+    map_hazards = [
+        ('highways', 'noise',  'primary', 6),
+        ('railways', 'noise',  '*',       8),
+        ('shop',     'vision', '*',       4)
+    ]
+
     # hazards array - could be from user input or IoT sensor
     sensor_hazards = [
         (51.4835, -3.1760, "noise", 9, "Sensor input"),
@@ -50,6 +56,14 @@ async def render_map():
                 if current_penalty > max_penalty:
                     max_penalty = current_penalty
 
+        for hazard, cat, query, score in map_hazards:
+            if data.get(hazard, query):
+                map_hazard_penalty += score
+
+        map_hazard_penalty = math.pow(2, map_hazard_penalty)/len(map_hazards)
+        if max_penalty < map_hazard_penalty:
+            max_penalty = map_hazard_penalty
+            
         data['accessible_weight'] = data['length'] * max_penalty
 
     # start end coords
