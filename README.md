@@ -13,9 +13,12 @@ make you rown api key at thsi website: https://www.cerebras.ai/
 pip install:
 
 dotenv
+
 cerebras
+
 osmnx
 
+folium
 
 
 call genai using call_genai.invoke_cerebras('prompt', temperature)
