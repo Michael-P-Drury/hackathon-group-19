@@ -14,3 +14,7 @@ pip install:
 
 dotenv
 cerebras
+
+
+
+call genai using call_genai.invoke_cerebras('prompt', temperature)
