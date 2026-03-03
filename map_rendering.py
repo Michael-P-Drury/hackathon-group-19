@@ -9,20 +9,40 @@ from get_location import get_coordinates
 
 
 
-async def render_map(destination):
+async def render_map(destination, persona):
+
+    visual_concern = persona[0]
+
+    noise_concern = persona[1]
 
     destination_coords = await get_coordinates(destination)
 
     destination_latitude = destination_coords["latitude"]
     destination_longitude = destination_coords["longitude"]
 
-    user_hazards = []
+    input_user_hazards = []
 
     with open("user_reports.txt", "r") as file:
         for line in file:
             line_list = line.split('|')
 
-            user_hazards.append((line_list[0], line_list[1], line_list[2], float(line_list[3]), line_list[4]))
+            input_user_hazards.append((line_list[0], line_list[1], line_list[2], float(line_list[3]), line_list[4]))
+
+    user_hazards = []
+
+    for hazard in input_user_hazards:
+        current_hazard_noise = False
+
+        if hazard[2] == 'noise':
+            current_hazard_noise = True
+        
+        if visual_concern:
+            if not current_hazard_noise:
+                user_hazards.append(hazard)
+        
+        if noise_concern:
+            if current_hazard_noise:
+                user_hazards.append(hazard)
 
     # bit of set up
     center_point = (51.4820, -3.1750) 
@@ -35,13 +55,29 @@ async def render_map(destination):
     ]
 
     # hazards array - could be from user input or IoT sensor
-    sensor_hazards = [
+    input_sensor_hazards = [
         (51.4835, -3.1760, "noise", 9, "Sensor input"),
         (51.4845, -3.1790, "noise", 4, "Sensor input"),
         (51.4825, -3.1730, "vision", 8, "Sensor input"),
         (51.4792, -3.1775, "vision", 5, "Sensor input")
     ]
     danger_radius = 0.0015
+
+    sensor_hazards = []
+
+    for hazard in input_sensor_hazards:
+        current_hazard_noise = False
+
+        if hazard[2] == 'noise':
+            current_hazard_noise = True
+        
+        if visual_concern:
+            if not current_hazard_noise:
+                sensor_hazards.append(hazard)
+        
+        if noise_concern:
+            if current_hazard_noise:
+                sensor_hazards.append(hazard)
 
     
     for u, v, k, data in G.edges(data=True, keys=True):
@@ -171,4 +207,4 @@ async def render_map(destination):
     webbrowser.open(output_file)
 
 
-asyncio.run(render_map('150 Woodville Road'))
+asyncio.run(render_map('150 Woodville Road', [False, True]))

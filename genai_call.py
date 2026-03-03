@@ -20,9 +20,7 @@ async def relevant_check(user_input):
 
     If it is relevant to noise you must return with just 'NOISE' and nothing else
 
-    If it is relevant to vision you MUST return 'VISUAL' and nothing else
-
-    If it is both a visual and a noise problem, you MUST return with 'BOTH'
+    If it is relevant to vision you MUST return 'VISION' and nothing else
 
     Is it is not relevant, reply with NONE and nothing else.
     """
@@ -46,7 +44,7 @@ async def noise_scoring(user_input):
 
     Use this for reference:
 
-    Noise level rating scale: item descriptions
+    Noise level rating scale:
     1-2 Someone could comfortably hear you use a whisper / very quiet voice from 1 metre away (e.g. library)
     3-4 You could easily hold a conversation with someone 1 metre away from you without raising your voice
     5-6 Conversation is possible with someone 1 metre away, but requires you to raise your voice (e.g., noisy cafe)
@@ -111,13 +109,13 @@ async def run_input_complaint(user_input):
 
     relevant_response = await relevant_check(user_input)
 
-    if relevant_response.lower().strip() == 'visual':
+    if relevant_response.lower().strip() == 'vision':
         scoring_response = await visual_scoring(user_input)
 
         score = scoring_response.split('\n')[0].strip()
         description = scoring_response.split('\n')[1].strip()
 
-        return {'status': True, 'type': 'visual', 'score': score, 'description': description}
+        return {'status': True, 'type': 'vision', 'score': score, 'description': description}
 
     elif relevant_response.lower().strip() == 'noise':
         scoring_response = await noise_scoring(user_input)
@@ -136,13 +134,15 @@ async def create_report(report_text, location):
 
     response = await run_input_complaint(report_text)
 
-    location = await get_coordinates(location)
+    if int(response['score']) >= 4:
 
-    append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
+        location = await get_coordinates(location)
 
-    with open("user_reports.txt", "a") as file:
-        file.write(f"{append_report}\n")
+        append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
 
-    file.close()
+        with open("user_reports.txt", "a") as file:
+            file.write(f"{append_report}\n")
+
+        file.close()
     
-asyncio.run(create_report('a pidgeon chirping', '26 flora street'))
+asyncio.run(create_report('bright neon sign', '63 woodville road'))
