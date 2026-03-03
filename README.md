@@ -14,6 +14,7 @@ pip install:
 
 dotenv
 cerebras
+osmnx
 
 
 
