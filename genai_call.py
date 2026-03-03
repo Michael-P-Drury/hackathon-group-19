@@ -1,6 +1,7 @@
 from cerebras.cloud.sdk import AsyncCerebras
 import os
 from dotenv import load_dotenv
+from get_location import get_coordinates
 
 
 import asyncio
@@ -104,9 +105,8 @@ async def run_input_complaint(user_input):
     if relevant_response.lower().strip() == 'visual':
         scoring_response = await visual_scoring(user_input)
 
-        score = scoring_response.split('\n')[0]
-        decibel = scoring_response.split('\n')[1]
-        description = scoring_response.split('\n')[2]
+        score = scoring_response.split('\n')[0].strip()
+        description = scoring_response.split('\n')[1].strip()
 
         return {'status': True, 'type': 'visual', 'score': score, 'description': description}
 
@@ -114,9 +114,8 @@ async def run_input_complaint(user_input):
         scoring_response = await noise_scoring(user_input)
         score = scoring_response.split('\n')
 
-        score = scoring_response.split('\n')[0]
-        decibel = scoring_response.split('\n')[1]
-        description = scoring_response.split('\n')[2]
+        score = scoring_response.split('\n')[0].strip()
+        description = scoring_response.split('\n')[1].strip()
 
         return {'status': True, 'type': 'noise', 'score': score, 'description': description}
 
@@ -124,9 +123,16 @@ async def run_input_complaint(user_input):
         return {'status': None, 'type': None, 'score': None, 'description': None}
     
 
-response = asyncio.run(run_input_complaint('74 jet engines'))
+async def create_report(report_text, location):
 
-print(response['status'])
-print(response['type'])
-print(response['score'])
-print(response['description'])
+    response = asyncio.run(run_input_complaint(report_text))
+
+    location = asyncio.run(get_coordinates(location))
+
+    append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
+
+    with open("user_reports.txt", "a") as file:
+        file.write(f"{append_report}\n")
+
+    file.close()
+    

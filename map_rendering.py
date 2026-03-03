@@ -8,7 +8,15 @@ import asyncio
 
 
 
-async def render_map(user_hazards):
+async def render_map():
+
+    user_hazards = []
+
+    with open("user_reports.txt", "r") as file:
+        for line in file:
+            line_list = line.split('|')
+
+            user_hazards.append((line_list[0], line_list[1], line_list[2], float(line_list[3]), line_list[4]))
 
     # bit of set up
     center_point = (51.4820, -3.1750) 
@@ -141,12 +149,4 @@ async def render_map(user_hazards):
     webbrowser.open(output_file)
 
 
-
-user_hazards = [
-    (51.4895, -3.1740, "noise", 9, "construction"),
-    (51.4805, -3.1730, "noise", 4, "one man talking loud on phone"),
-    (51.4875, -3.1710, "vision", 8, "lights out"),
-    (51.4772, -3.1780, "vision", 5, "light flickering")
-]
-
-asyncio.run(render_map(user_hazards))
+asyncio.run(render_map())
