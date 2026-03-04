@@ -5,31 +5,57 @@ import folium
 import webbrowser
 from shapely.geometry import Point
 import asyncio
+from get_location import get_coordinates
 
 
 
-async def render_map():
+async def render_map(destination, persona):
 
-    user_hazards = []
+    visual_concern = persona[0]
+
+    noise_concern = persona[1]
+
+    destination_coords = await get_coordinates(destination)
+
+    destination_latitude = destination_coords["latitude"]
+    destination_longitude = destination_coords["longitude"]
+
+    input_user_hazards = []
 
     with open("user_reports.txt", "r") as file:
         for line in file:
             line_list = line.split('|')
 
-            user_hazards.append((line_list[0], line_list[1], line_list[2], float(line_list[3]), line_list[4]))
+            input_user_hazards.append((line_list[0], line_list[1], line_list[2], float(line_list[3]), line_list[4]))
+
+    user_hazards = []
+
+    for hazard in input_user_hazards:
+        current_hazard_noise = False
+
+        if hazard[2] == 'noise':
+            current_hazard_noise = True
+        
+        if visual_concern:
+            if not current_hazard_noise:
+                user_hazards.append(hazard)
+        
+        if noise_concern:
+            if current_hazard_noise:
+                user_hazards.append(hazard)
 
     # bit of set up
     center_point = (51.4820, -3.1750) 
-    G = ox.graph_from_point(center_point, dist=1000, network_type='walk')
+    G = ox.graph_from_point(center_point, dist=3000, network_type='walk')
 
     map_hazards = [
-        ('highways', 'noise',  'primary', 6),
-        ('railways', 'noise',  '*',       8),
-        ('shop',     'vision', '*',       4)
+        ('highways', 'noise',  'primary', 3),
+        ('railways', 'noise',  '*',       2),
+        ('shop',     'vision', '*',       1)
     ]
 
     # hazards array - could be from user input or IoT sensor
-    sensor_hazards = [
+    input_sensor_hazards = [
         (51.4835, -3.1760, "noise", 9, "Sensor input"),
         (51.4845, -3.1790, "noise", 4, "Sensor input"),
         (51.4825, -3.1730, "vision", 8, "Sensor input"),
@@ -37,6 +63,23 @@ async def render_map():
     ]
     danger_radius = 0.0015
 
+    sensor_hazards = []
+
+    for hazard in input_sensor_hazards:
+        current_hazard_noise = False
+
+        if hazard[2] == 'noise':
+            current_hazard_noise = True
+        
+        if visual_concern:
+            if not current_hazard_noise:
+                sensor_hazards.append(hazard)
+        
+        if noise_concern:
+            if current_hazard_noise:
+                sensor_hazards.append(hazard)
+
+    
     for u, v, k, data in G.edges(data=True, keys=True):
         node_coords = G.nodes[u]
         edge_point = Point(node_coords['x'], node_coords['y'])
@@ -56,6 +99,7 @@ async def render_map():
                 if current_penalty > max_penalty:
                     max_penalty = current_penalty
 
+        map_hazard_penalty = 0
         for hazard, cat, query, score in map_hazards:
             if data.get(hazard, query):
                 map_hazard_penalty += score
@@ -63,12 +107,12 @@ async def render_map():
         map_hazard_penalty = math.pow(2, map_hazard_penalty)/len(map_hazards)
         if max_penalty < map_hazard_penalty:
             max_penalty = map_hazard_penalty
-            
+
         data['accessible_weight'] = data['length'] * max_penalty
 
     # start end coords
     start_coords = (51.4820, -3.1750) 
-    end_coords = (51.4855, -3.1775)
+    end_coords = (destination_latitude, destination_longitude)
     origin_node = ox.distance.nearest_nodes(G, X=start_coords[1], Y=start_coords[0])
     target_node = ox.distance.nearest_nodes(G, X=end_coords[1], Y=end_coords[0])
 
@@ -80,7 +124,7 @@ async def render_map():
     accessible_route = nx.shortest_path(G, origin_node, target_node, weight='accessible_weight')
 
     # generate
-    route_map = folium.Map(location=center_point, zoom_start=15)
+    route_map = folium.Map(location=center_point, zoom_start=15, tiles="CartoDB positron")
 
     # Convert routes to coordinates
     std_coords = [[G.nodes[n]['y'], G.nodes[n]['x']] for n in standard_route]
@@ -163,4 +207,4 @@ async def render_map():
     webbrowser.open(output_file)
 
 
-asyncio.run(render_map())
+asyncio.run(render_map('150 Woodville Road', [False, True]))

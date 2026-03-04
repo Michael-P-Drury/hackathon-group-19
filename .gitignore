@@ -4,3 +4,4 @@ __pycache__
 .env
 .venv
 user_reports.txt
+assets/

@@ -123,16 +123,34 @@ async def run_input_complaint(user_input):
         return {'status': None, 'type': None, 'score': None, 'description': None}
     
 
-async def create_report(report_text, location):
+#async def create_report(report_text, location):
 
-    response = asyncio.run(run_input_complaint(report_text))
+#    response = asyncio.run(run_input_complaint(report_text))
 
-    location = asyncio.run(get_coordinates(location))
+#    location = asyncio.run(get_coordinates(location))
 
-    append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
+#    append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
 
-    with open("user_reports.txt", "a") as file:
-        file.write(f"{append_report}\n")
+#    with open("user_reports.txt", "a") as file:
+#        file.write(f"{append_report}\n")
 
-    file.close()
+#    file.close()
+
+async def create_report(report_text, location_name):
+    # Use await directly since the function is already async
+    response = await run_input_complaint(report_text)
+
+    print(response)
     
+
+    location_data = await get_coordinates(location_name)
+
+    print(location_data)
+
+    if response['status'] and location_data:
+        append_report = f"{location_data['latitude']}|{location_data['longitude']}|{response['type']}|{response['score']}|{response['description']}"
+        with open("user_reports.txt", "a") as file:
+            file.write(f"{append_report}\n")
+        return True
+    
+    return False
