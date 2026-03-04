@@ -1,0 +1,8 @@
+51.4913933|-3.1791551|vision|8|Obstructed path, confusing temporary signage
+51.4854686|-3.1807318|noise|9|Overwhelming noise, hard to navigate
+51.4921183|-3.1790938|vision|7|Glare overwhelms low-vision city navigation
+51.4921183|-3.1790938|vision|7|Glare and high contrast distraction
+51.4912071|-3.1747676|noise|8|Loud continuous crowd chanting noise
+51.4921183|-3.1790938|vision|7|Glare and high contrast distraction
+51.4818121|-3.1706468|noise|9|Train noise overwhelms city walk51.4912071|-3.1747676|vision|9|Reduced visibility, increased navigation risk
+51.489115|-3.1786926|vision|9|Darkness hampers safe nighttime navigation

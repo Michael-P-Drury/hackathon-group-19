@@ -117,6 +117,5 @@ def HomeView(page, ft=ft):
         map_view
     ], scroll=ft.ScrollMode.ADAPTIVE)
 
-
-    # 4. Return the View FINALLY
+    
     return content
