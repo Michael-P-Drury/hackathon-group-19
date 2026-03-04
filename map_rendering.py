@@ -124,7 +124,22 @@ async def render_map(destination, persona):
     accessible_route = nx.shortest_path(G, origin_node, target_node, weight='accessible_weight')
 
     # generate
-    route_map = folium.Map(location=center_point, zoom_start=15, tiles="CartoDB positron")
+    route_map = folium.Map(location=center_point, zoom_start=15, tiles=None)
+
+    folium.TileLayer(
+        tiles="OpenStreetMap",
+        name="Light",
+        control=True
+    ).add_to(route_map)
+
+    folium.TileLayer(
+        tiles="CartoDB dark_matter",
+        name="Dark",
+        control=True
+    ).add_to(route_map)
+
+    # add to switch
+    folium.LayerControl(collapsed=False).add_to(route_map)
 
     # Convert routes to coordinates
     std_coords = [[G.nodes[n]['y'], G.nodes[n]['x']] for n in standard_route]

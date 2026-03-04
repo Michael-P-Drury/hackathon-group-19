@@ -20,9 +20,7 @@ async def relevant_check(user_input):
 
     If it is relevant to noise you must return with just 'NOISE' and nothing else
 
-    If it is relevant to vision you MUST return 'VISUAL' and nothing else
-
-    If it is both a visual and a noise problem, you MUST return with 'BOTH'
+    If it is relevant to vision you MUST return 'VISION' and nothing else
 
     Is it is not relevant, reply with NONE and nothing else.
     """
@@ -43,6 +41,15 @@ async def noise_scoring(user_input):
 
     1 - minimal problem
     10 - Very loud big problem
+
+    Use this for reference:
+
+    Noise level rating scale:
+    1-2 Someone could comfortably hear you use a whisper / very quiet voice from 1 metre away (e.g. library)
+    3-4 You could easily hold a conversation with someone 1 metre away from you without raising your voice
+    5-6 Conversation is possible with someone 1 metre away, but requires you to raise your voice (e.g., noisy cafe)
+    7-8 You need to shout to be heard by someone 1 metre away. Difficult to hold a conversation
+    9-10 Cannot be heard by someone 1 metre away, even when shouting. Volume level may be uncomfortable after a short time
 
     return with a number from 1-10 and on a new line a 5 word description of the problem.
     """
@@ -102,13 +109,13 @@ async def run_input_complaint(user_input):
 
     relevant_response = await relevant_check(user_input)
 
-    if relevant_response.lower().strip() == 'visual':
+    if relevant_response.lower().strip() == 'vision':
         scoring_response = await visual_scoring(user_input)
 
         score = scoring_response.split('\n')[0].strip()
         description = scoring_response.split('\n')[1].strip()
 
-        return {'status': True, 'type': 'visual', 'score': score, 'description': description}
+        return {'status': True, 'type': 'vision', 'score': score, 'description': description}
 
     elif relevant_response.lower().strip() == 'noise':
         scoring_response = await noise_scoring(user_input)
@@ -120,7 +127,7 @@ async def run_input_complaint(user_input):
         return {'status': True, 'type': 'noise', 'score': score, 'description': description}
 
     else:
-        return {'status': None, 'type': None, 'score': None, 'description': None}
+        return {'status': False, 'type': None, 'score': None, 'description': None}
     
 
 #async def create_report(report_text, location):

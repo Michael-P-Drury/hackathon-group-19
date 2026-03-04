@@ -123,8 +123,38 @@ async def render_map(destination, persona):
     # Accessible Route (Avoids the hazards (hopefully))
     accessible_route = nx.shortest_path(G, origin_node, target_node, weight='accessible_weight')
 
-    # generate
-    route_map = folium.Map(location=center_point, zoom_start=15, tiles="CartoDB positron")
+    # generate (NO default tiles)
+    route_map = folium.Map(location=center_point, zoom_start=15, tiles=None)
+
+    # Add CartoDB Positron with CORS enabled
+    folium.TileLayer(
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
+        attr="© OpenStreetMap contributors, © CARTO",
+        name="CartoDB Positron",
+        overlay=False,
+        control=False,
+        **{"crossOrigin": "anonymous"},
+    ).add_to(route_map)
+
+
+
+    folium.TileLayer(
+        tiles="OpenStreetMap",
+        name="Light",
+        control=True
+    ).add_to(route_map)
+
+    folium.TileLayer(
+        tiles="CartoDB dark_matter",
+        name="Dark",
+        control=True,
+        **{"crossOrigin": "anonymous"},
+    ).add_to(route_map)
+
+    # add to switch
+    folium.LayerControl(collapsed=False).add_to(route_map)
+
+
 
     # Convert routes to coordinates
     std_coords = [[G.nodes[n]['y'], G.nodes[n]['x']] for n in standard_route]
