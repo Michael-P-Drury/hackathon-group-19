@@ -144,7 +144,7 @@ async def run_input_complaint(user_input):
 #    file.close()
 
 async def create_report(report_text, location_name):
-    # Use await directly since the function is already async
+    
     response = await run_input_complaint(report_text)
 
     print(response)

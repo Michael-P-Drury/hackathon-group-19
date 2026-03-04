@@ -7,7 +7,7 @@ import os
 
 def HomeView(page, ft=ft):
     
-    # --- 1. Define UI Elements FIRST ---
+    #defining elements
     report_input = ft.TextField(
         label="What is the issue?", 
         hint_text="e.g. Construction site with loud drilling", 
@@ -29,7 +29,7 @@ def HomeView(page, ft=ft):
     map_view = fwv.WebView(height=600, visible=False)
 
 
-    # --- 2. Define Event Handlers SECOND ---
+    # -handling events
     async def submit_report(e):
         if not report_input.value or not location_input.value:
             status_text.value = "Please fill in both hazard fields!"
@@ -40,7 +40,7 @@ def HomeView(page, ft=ft):
         status_text.value = "Analyzing hazard with Cerebras AI..."
         page.update()
 
-        # Assuming genai_call is available in this scope
+
         success = await genai_call.create_report(report_input.value, location_input.value)
         
         loading_ring.visible = False
@@ -65,11 +65,11 @@ def HomeView(page, ft=ft):
         
         needs_visual_routing = visual_cb.value
         needs_sensory_routing = sensory_cb.value
-        # 1. Generate the file
+        
         filename = await map_rendering_2.render_map(dest_input.value, [visual_cb.value, sensory_cb.value])
         
         if filename:
-            # 2. Open the file in a new tab on the phone
+            
             map_url = f"/{filename}" 
             await page.launch_url(map_url)
             
@@ -78,9 +78,6 @@ def HomeView(page, ft=ft):
             status_text.value = "Error generating map."
         page.update()
 
-
-    # --- 3. Build the Layout THIRD ---
-    # Now that everything is defined, assemble it inside the Column
 
     visual_cb = ft.Checkbox(label="Visual disturbances", value=False)
     sensory_cb = ft.Checkbox(label="Audible  disturbances", value=False)   

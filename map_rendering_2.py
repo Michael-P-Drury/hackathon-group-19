@@ -116,7 +116,7 @@ async def render_map(destination, persona):
     origin_node = ox.distance.nearest_nodes(G, X=start_coords[1], Y=start_coords[0])
     target_node = ox.distance.nearest_nodes(G, X=end_coords[1], Y=end_coords[0])
 
-    # 
+    
     # fastest path (not accessible)
     standard_route = nx.shortest_path(G, origin_node, target_node, weight='length')
 
@@ -126,7 +126,7 @@ async def render_map(destination, persona):
     # generate (NO default tiles)
     route_map = folium.Map(location=center_point, zoom_start=15, tiles=None)
 
-    # Add CartoDB Positron with CORS enabled
+    # CORS disabled - v important  
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
         attr="© OpenStreetMap contributors, © CARTO",
@@ -151,21 +151,20 @@ async def render_map(destination, persona):
         **{"crossOrigin": "anonymous"},
     ).add_to(route_map)
 
-    # add to switch
+    # making switch
     folium.LayerControl(collapsed=False).add_to(route_map)
 
 
 
-    # Convert routes to coordinates
+   
     std_coords = [[G.nodes[n]['y'], G.nodes[n]['x']] for n in standard_route]
     acc_coords = [[G.nodes[n]['y'], G.nodes[n]['x']] for n in accessible_route]
 
-    # draw both routes
-    # Standard route in RED 
+    # Standard route in red 
     folium.PolyLine(std_coords, color='red', weight=4, opacity=0.6, 
                     dash_array='10', popup="Standard Route (Noisy)").add_to(route_map)
 
-    # Accessible route in GREEN
+    # Accessible route in green
     folium.PolyLine(acc_coords, color='#2e7d32', weight=7, opacity=0.9, 
                     popup="Accessible Route (Quiet)").add_to(route_map)
 
@@ -219,7 +218,6 @@ async def render_map(destination, persona):
     folium.Marker(location=start_coords, popup="Start", icon=folium.Icon(color='blue')).add_to(route_map)
     folium.Marker(location=end_coords, popup="Destination", icon=folium.Icon(color='black')).add_to(route_map)
 
-    #  legend
     legend_html = '''
         <div style="position: fixed; bottom: 50px; left: 50px; width: 180px; height: 90px; 
         border:2px solid grey; z-index:9999; font-size:14px; background-color:white;
@@ -231,19 +229,16 @@ async def render_map(destination, persona):
         '''
     route_map.get_root().html.add_child(folium.Element(legend_html))
 
-    # --- NEW FILE ROTATION LOGIC ---
     assets_dir = "assets"
-    os.makedirs(assets_dir, exist_ok=True) # Ensure the folder exists
+    os.makedirs(assets_dir, exist_ok=True) # Ensure  folder exists
     
-    # Create a unique filename using a timestamp
     timestamp = int(time.time())
     filename = f"route_{timestamp}.html"
     filepath = os.path.join(assets_dir, filename)
 
-    # Save the new map
     route_map.save(filepath)
 
-    # Find all saved route maps and sort them by creation time (newest first)
+    # Find all saved route maps and sort them by creation time 
     saved_maps = glob.glob(os.path.join(assets_dir, "route_*.html"))
     saved_maps.sort(key=os.path.getctime, reverse=True)
 
@@ -264,8 +259,3 @@ async def render_map(destination, persona):
     
     route_map.save(filepath)
     return filename
-    
-    
-
-# Commented out so it doesn't run automatically when run.py imports it
-# asyncio.run(render_map('150 Woodville Road', [False, True]))
