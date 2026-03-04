@@ -176,7 +176,7 @@ async def render_map(destination, persona):
             circ_color = "red"
         else:
             icon_type = "eye-slash"
-            circ_color = "orange"
+            circ_color = "blue"
 
         folium.Circle(
             location=[h_lat, h_lon],
@@ -199,7 +199,7 @@ async def render_map(destination, persona):
             circ_color = "red"
         else:
             icon_type = "eye-slash"
-            circ_color = "orange"
+            circ_color = "blue"
 
         folium.Circle(
             location=[h_lat, h_lon],
