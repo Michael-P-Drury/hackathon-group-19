@@ -3,6 +3,8 @@ cache
 __pycache__
 .env
 .venv
+user_reports.txt
+assets/
 venv/
 user_reports.txt
 /assets
