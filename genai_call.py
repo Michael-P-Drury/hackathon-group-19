@@ -127,22 +127,26 @@ async def run_input_complaint(user_input):
         return {'status': True, 'type': 'noise', 'score': score, 'description': description}
 
     else:
-        return {'status': None, 'type': None, 'score': None, 'description': None}
+        return {'status': False, 'type': None, 'score': None, 'description': None}
     
 
 async def create_report(report_text, location):
 
     response = await run_input_complaint(report_text)
 
-    if int(response['score']) >= 4:
+    if response['status']:
 
-        location = await get_coordinates(location)
+        if int(response['score']) >= 4:
 
-        append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
+            location = await get_coordinates(location)
 
-        with open("user_reports.txt", "a") as file:
-            file.write(f"{append_report}\n")
+            if location['latitude']:
 
-        file.close()
+                append_report = f"{location['latitude']}|{location['longitude']}|{response['type']}|{response['score']}|{response['description']}"
+
+                with open("user_reports.txt", "a") as file:
+                    file.write(f"{append_report}\n")
+
+                file.close()
     
 asyncio.run(create_report('bright neon sign', '63 woodville road'))
