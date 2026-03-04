@@ -82,10 +82,10 @@ def HomeView(page, ft=ft):
     # --- 3. Build the Layout THIRD ---
     # Now that everything is defined, assemble it inside the Column
 
-    visual_cb = ft.Checkbox(label="Visual Impairment", value=False)
-    sensory_cb = ft.Checkbox(label="Sensory Considerations", value=False)   
+    visual_cb = ft.Checkbox(label="Visual disturbances", value=False)
+    sensory_cb = ft.Checkbox(label="Audible  disturbances", value=False)   
     content = ft.Column([        
-        ft.Text("Where would you like to go ?", size=25, weight=ft.FontWeight.BOLD),
+        ft.Text("Where would you like to go?", size=25, weight=ft.FontWeight.BOLD),
         ft.Text("Accessibility options", size=20, weight=ft.FontWeight.BOLD),
         visual_cb,
         sensory_cb,
@@ -96,7 +96,7 @@ def HomeView(page, ft=ft):
             on_click=open_map, 
             icon="map", 
             color="white", 
-            bgcolor="#1d4289"
+            bgcolor="#1d4289",
         ),
         # ft.Container(height=10),
         status_text,
@@ -115,23 +115,6 @@ def HomeView(page, ft=ft):
             loading_ring
         ]),
         
-        # ft.Divider(height=40, thickness=2),
-        
-        # ft.Text("Step 2: Generate Accessible Route", size=25, weight=ft.FontWeight.BOLD),
-        # visual_cb,
-        # sensory_cb,
-        # ft.Text("Enter your destination to find the quietest/safest path."),
-        # dest_input,
-        # ft.ElevatedButton(
-        #     "Render Map",
-        #     on_click=open_map, 
-        #     icon="map", 
-        #     color="white", 
-        #     bgcolor="green"
-        # ),
-        
-        # ft.Container(height=20),
-        # status_text,
         
         # The map view element positioned at the bottom of the column
         map_view

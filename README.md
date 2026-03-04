@@ -1,3 +1,6 @@
+This project contains the code for group 19 in the hackathon.
+We have created a map aimed at providing additional features for individuals suffering from visual or audible impairments.
+
 *** HOW TO RUN ***
 **IMPORTANT PORT FOWARDING is needed to run on phone**
 
@@ -14,8 +17,8 @@ To run locally:
 python main.py
 
 
-
-
+**IMPORTANT** 
+**You will need API key from cerebras to run, this is free and only needs email sign up**
 
 need .env file with following format:
 CEREBRAS_API_KEY=""
